@@ -1,19 +1,48 @@
 import numpy as np
 import tflite_runtime.interpreter as tflite
 import cv2
+import argparse
+
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-
-# Change these settings (TODO: make into args)
-CLASSIFIER_MODEL_PATH = "ei-pose-classification-demo-nn-classifier-tensorflow-lite-float32-model.lite"
-LABELS = ["_unknown", "A", "C", "M", "Y"]
-DRAW_SCALE = 2
 
 # Settings
 MOVENET_MODEL_PATH = "movenet.tflite"
 CAM_WIDTH = 192     # Camera width
 CAM_HEIGHT = 192    # Camera height
-CAM_ROTATION = 90    # Camera rotation (0, 90, 180, or 270)
+DRAW_SCALE = 2
+
+# Command line arguments
+parser = argparse.ArgumentParser(description="Run pose classification inference")
+parser.add_argument('-m',
+                    '--model',
+                    dest='model',
+                    type=str,
+                    required=True,
+                    help="Path to TFLite model file for classification")
+parser.add_argument('-l',
+                    '--labels',
+                    dest='labels',
+                    type=str,
+                    required=True,
+                    help="Path to .txt file with label on each line")
+parser.add_argument('-r',
+                    '--rotation',
+                    dest='rotation',
+                    type=int,
+                    default=0,
+                    help="Rotation of captured image (0, 90, 180, 270)")
+
+# Parse arguments
+args = parser.parse_args()
+classifier_model_path = args.model
+labels_path = args.labels
+cam_rotation = args.rotation
+
+# Parse labels file
+with open(labels_path) as f:
+    lines = f.readlines()
+labels = [s.strip() for s in lines]
 
 # Initialize the TFLite interpreter for pose estimation
 pose_interpreter = tflite.Interpreter(model_path="movenet.tflite")
@@ -24,7 +53,7 @@ pose_input_details = pose_interpreter.get_input_details()
 pose_output_details = pose_interpreter.get_output_details()
 
 # Initialize the TFLite interpreter for pose classification
-classifier_interpreter = tflite.Interpreter(model_path="ei-pose-classification-demo-nn-classifier-tensorflow-lite-float32-model.lite")
+classifier_interpreter = tflite.Interpreter(model_path=classifier_model_path)
 classifier_interpreter.allocate_tensors()
 
 # Set up interpreter
@@ -39,7 +68,7 @@ with PiCamera() as camera:
     
     # Configure camera settings
     camera.resolution = (CAM_WIDTH, CAM_HEIGHT)
-    camera.rotation = CAM_ROTATION
+    camera.rotation = cam_rotation
     
     # Container for our frames
     raw_capture = PiRGBArray(camera, size=(CAM_WIDTH, CAM_HEIGHT))
@@ -76,7 +105,7 @@ with PiCamera() as camera:
 
         # Find label with the highest probability
         idx_max = np.argmax(classifier_output)
-        label_max = LABELS[idx_max]
+        label_max = labels[idx_max]
 
         # Make the image a little easier to see
         #draw_img = cv2.resize(img, (CAM_WIDTH * DRAW_SCALE, CAM_HEIGHT * DRAW_SCALE))
