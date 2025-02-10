@@ -6,7 +6,7 @@ Use one of the Colab scripts to break apart video into frames and upload them as
 * cam_video_capture_and_extract_frames.ipynb: use your webcam to capture video. **Chrome only!**
 * vlc_frame_extract_and_upload.ipynb: take video with your phone. Upload that video to this Colab and run it to extract frames.
 
-Train your machine learning model on Edge Impulse using the *pose-estimation* custom DSP block (available at workshop and for enterprise customers). Go to the Dashboard and download the float32 TFLite model file. Create a .txt file containing a string for each label (one on each line). 
+Train your machine learning model on Edge Impulse using the *pose-estimation* custom DSP block (available at workshop and for enterprise customers). Go to the Dashboard and download the float32 TFLite model file. Create a .txt file containing a string for each label (one on each line).
 
 Install dependencies:
 
@@ -21,22 +21,4 @@ Run the *rpi-pose-inference.py* script on your Raspberry Pi. Make sure *movenet.
 
 ```
 python rpi-pose-inference.py -m ymca-classifier-model.lite -l ymca-labels.txt -r 90
-``` 
-
-## License
-
-Unless otherwise specified, code samples in this repository are licensed under the APACHE 2.0 open source license.
-
-Copyright 2022 EdgeImpulse, Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+```
